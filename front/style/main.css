@@ -1,0 +1,22 @@
+h1 {
+    font-size: calc(var(--font-size) * 4);
+    margin-bottom: calc(var(--font-size) * 2);
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+#uploadJSON {
+    display: none;
+}

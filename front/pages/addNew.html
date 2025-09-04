@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style/normalize.css">
+    <link rel="stylesheet" href="/style/variables.css">
+    <link rel="stylesheet" href="/style/menu.css">
+    <title>ToDo List</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <span> Create your task: </span>
+        </header>
+        <main>
+            <form action="" method="POST" name="new__task">
+                <div class="row">
+                    <label for="title">Title:</label>
+                    <input type="text" name="title" id="title" required>
+                </div>
+                <div class="row">
+                    <label for="description">Description:</label>
+                    <textarea id="description"></textarea>
+                </div>
+                <div class="row">
+                    <label for="status">Status:</label>
+                    <input type="checkbox" name="status" id="status">
+                </div>
+            </form>
+        </main>
+        <footer>
+            <button class="button big" id="cancel">Cancel</button>
+            <button class="button big" id="save">Save</button>
+        </footer>
+
+        <script src="../scripts/addNew.js"></script>
+</body>
+</html>
