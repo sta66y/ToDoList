@@ -1,6 +1,8 @@
 package com.example.ToDoList.models;
 
+import lombok.Builder;
 
+@Builder
 public class TaskResponseDTO {
     private Long id;
 
