@@ -3,13 +3,14 @@ package com.example.ToDoList.controller;
 import com.example.ToDoList.models.TaskRequestDTO;
 import com.example.ToDoList.models.TaskResponseDTO;
 import com.example.ToDoList.service.TasksService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/todos")
+@RequestMapping("/api/todos")
 @AllArgsConstructor
 public class TasksController {
     private final TasksService tasksService;
@@ -25,7 +26,7 @@ public class TasksController {
     }
 
     @PostMapping
-    public TaskResponseDTO createTask(@RequestBody TaskRequestDTO dto) {
+    public TaskResponseDTO createTask(@RequestBody @Valid TaskRequestDTO dto) {
         return tasksService.createTask(dto);
     }
 
@@ -35,7 +36,7 @@ public class TasksController {
     }
 
     @PutMapping("/{id}")
-    public TaskResponseDTO editTaskById(@PathVariable Long id, @RequestBody TaskRequestDTO dto) {
+    public TaskResponseDTO editTaskById(@PathVariable Long id, @RequestBody @Valid TaskRequestDTO dto) {
         return tasksService.editTaskById(id, dto);
     }
 
@@ -45,7 +46,7 @@ public class TasksController {
     }
 
     @PostMapping("/upload")
-    public List<TaskResponseDTO> uploadTasksFromJson(@RequestBody List<TaskRequestDTO> dtos) {
+    public List<TaskResponseDTO> uploadTasksFromJson(@RequestBody @Valid List<TaskRequestDTO> dtos) {
         return tasksService.uploadTasksFromJson(dtos);
     }
 }
