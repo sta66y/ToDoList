@@ -30,6 +30,7 @@ public class TasksService {
 
 
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
+        if (dto.getCompleted() == null) setFalseForNull(dto);
         Task task = tasksRepository.save(TasksMapper.toTask(dto));
         return TasksMapper.toTaskResponseDTO(task);
     }
@@ -44,6 +45,7 @@ public class TasksService {
 
 
     public TaskResponseDTO editTaskById(Long id, TaskRequestDTO dto) {
+        if (dto.getCompleted() == null) setFalseForNull(dto);
         Task taskToEdit = findTaskOrThrow(id);
 
         taskToEdit.setCompleted(dto.getCompleted());
@@ -58,7 +60,8 @@ public class TasksService {
     public TaskResponseDTO changeCompletedStatusById(Long id) {
         Task taskToUpdate = findTaskOrThrow(id);
 
-        taskToUpdate.setCompleted(!taskToUpdate.getCompleted());
+        if (taskToUpdate.getCompleted() == null) taskToUpdate.setCompleted(false);
+        else taskToUpdate.setCompleted(!taskToUpdate.getCompleted());
 
         tasksRepository.save(taskToUpdate);
 
@@ -79,6 +82,10 @@ public class TasksService {
     private Task findTaskOrThrow(Long id) {
         return tasksRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFound("Задачи с таким id не найдено"));
+    }
+
+    private void setFalseForNull(TaskRequestDTO dto) {
+        dto.setCompleted(false);
     }
 
 }
