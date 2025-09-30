@@ -3,40 +3,42 @@ const btn_cancel = document.getElementById('cancel');
 
 const editData = JSON.parse(localStorage.getItem("editTask"));
 if (editData) {
-    document.getElementById("title").value = editData.task.title;
-    document.getElementById("description").value = editData.task.description;
-    document.getElementById("status").checked = editData.task.status;
+    document.getElementById("title").value = editData.title;
+    document.getElementById("description").value = editData.description;
+    document.getElementById("status").checked = editData.completed;
 }
 
 btn_cancel.addEventListener('click', () => {
-    window,location.href = "../pages/menu.html"
-})
+    window.location.href = "../pages/menu.html";
+});
 
-btn_save.addEventListener('click', () => {
+btn_save.addEventListener('click', async () => {
     const title = document.getElementById("title").value.trim();
     const description = document.getElementById("description").value.trim();
     const status = document.getElementById("status").checked;
 
-    if (title == "") {
+    if (title === "") {
         alert("Введите название задачи!");
         return;
     }
 
-    const newTask = {
-        "title" : title,
-        "description" : description,
-        "status" : status
-    };
-
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    // ✅ объявляем newTask один раз, всегда
+    const newTask = { title, description, completed: status };
 
     if (editData) {
-        tasks[editData.index] = newTask;
+        await fetch(`http://localhost:8080/api/todos/${editData.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTask)
+        });
         localStorage.removeItem("editTask");
     } else {
-        tasks.push(newTask);
+        await fetch("http://localhost:8080/api/todos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTask)
+        });
     }
 
-    localStorage.setItem("tasks", JSON.stringify(tasks));
     window.location.href = "../pages/menu.html";
-})
+});
