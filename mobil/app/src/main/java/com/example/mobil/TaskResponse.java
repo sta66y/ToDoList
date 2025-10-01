@@ -1,23 +1,10 @@
 package com.example.mobil;
 
-public class Task {
-    private Long id; // nullable, но после загрузки с сервера всегда есть
+public class TaskResponse {
+    private Long id;
     private String title;
     private String description;
     private boolean completed;
-
-    public Task() {}
-
-    public Task(Long id, String title, String description, boolean completed) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.completed = completed;
-    }
-
-    public Task(String title, String description, boolean completed) {
-        this(null, title, description, completed);
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,18 +44,57 @@ public class AddActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(v -> finish());
 
         saveButton.setOnClickListener(v -> {
-            String title = titleEdit.getText().toString();
-            String desc = descEdit.getText().toString();
+            String title = titleEdit.getText().toString().trim();
+            String desc = descEdit.getText().toString().trim();
             boolean completed = completedCheck.isChecked();
 
-            if (!title.isEmpty()) {
-                Task task = new Task(title, desc, completed);
-                if (isEdit) {
-                    TasksManager.updateTask(position, task);
+            if (title.isEmpty()) {
+                Toast.makeText(this, "Title required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            TaskRequest req = new TaskRequest(title, desc, completed);
+
+            if (isEdit) {
+                Task old = TasksManager.getTasks().get(position);
+                if (old.getId() == null) {
+                    // локальное, просто обновляем
+                    old.setTitle(title);
+                    old.setDescription(desc);
+                    old.setCompleted(completed);
+                    TasksManager.updateLocalTask(position, old);
+                    finish();
                 } else {
-                    TasksManager.addTask(task);
+                    TasksManager.updateTaskOnServer(this, old.getId(), req, new TasksManager.SimpleCallback() {
+                        @Override
+                        public void onSuccess() {
+                            runOnUiThread(() -> {
+                                Toast.makeText(AddActivity.this, "Updated", Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            runOnUiThread(() -> Toast.makeText(AddActivity.this, "Update failed: " + message, Toast.LENGTH_SHORT).show());
+                        }
+                    });
                 }
-                finish();
+            } else {
+                TasksManager.createTaskOnServer(this, req, new TasksManager.SimpleCallback() {
+                    @Override
+                    public void onSuccess() {
+                        runOnUiThread(() -> {
+                            Toast.makeText(AddActivity.this, "Created", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        runOnUiThread(() -> Toast.makeText(AddActivity.this, "Create failed: " + message, Toast.LENGTH_SHORT).show());
+                    }
+                });
             }
         });
     }

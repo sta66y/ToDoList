@@ -5,12 +5,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 public class TasksActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -27,7 +30,7 @@ public class TasksActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.tasks_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new TasksAdapter(TasksManager.getTasks(), this::editTask, this::deleteTask);
+        adapter = new TasksAdapter(this, TasksManager.getTasks(), this::editTask, this::deleteTask);
         recyclerView.setAdapter(adapter);
 
         Button backButton = findViewById(R.id.back_button);
@@ -61,7 +64,23 @@ public class TasksActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+        // загружаем актуальные задачи с сервера
+        TasksManager.fetchTasksFromServer(this, new TasksManager.SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(() -> {
+                    adapter.notifyDataSetChanged();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(TasksActivity.this, "Load failed: " + message, Toast.LENGTH_SHORT).show();
+                    adapter.notifyDataSetChanged(); // покажем локальные, если есть
+                });
+            }
+        });
     }
 
     private void editTask(int position) {
@@ -72,7 +91,6 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void deleteTask(int position) {
-        TasksManager.deleteTask(position);
-        adapter.notifyItemRemoved(position);
+        // nothing else here — TasksAdapter/TasksManager уже удаляют
     }
 }
